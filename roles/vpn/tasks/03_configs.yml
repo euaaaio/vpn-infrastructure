@@ -1,0 +1,36 @@
+---
+- name: Create configuration directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ vpn_path }}"
+    - "{{ vpn_path }}/nginx"
+    - "{{ vpn_path }}/x-ui"
+
+- name: Generate htpasswd file
+  ansible.builtin.shell: |
+    htpasswd -cb {{ vpn_path }}/nginx/htpasswd {{ basic_auth_username }} '{{ basic_auth_password }}'
+  args:
+    creates: "{{ vpn_path }}/nginx/htpasswd"
+  no_log: true
+
+- name: Set htpasswd permissions
+  ansible.builtin.file:
+    path: "{{ vpn_path }}/nginx/htpasswd"
+    mode: "0644"
+
+- name: Deploy nginx configuration
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ vpn_path }}/nginx/nginx.conf"
+    mode: "0644"
+  notify: Restart nginx
+
+- name: Copy Docker Compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ vpn_path }}/docker-compose.yml"
+    mode: "0644"
+  notify: Restart containers

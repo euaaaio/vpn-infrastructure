@@ -1,0 +1,28 @@
+---
+- name: Configure VPN server
+  hosts: vpn
+  become: true
+  vars_files:
+    - vars/main.yml
+    - vars/secrets.yml
+
+  pre_tasks:
+    - name: Backup VPN data before deploy
+      ansible.posix.synchronize:
+        src: /srv/vpn/
+        dest: ./backup/vpn/
+        mode: pull
+        rsync_opts:
+          - '--rsync-path="sudo rsync"'
+      delegate_to: localhost
+      become: false
+      ignore_errors: true
+      tags: [backup]
+
+  roles:
+    - role: common
+      tags: [common]
+    - role: docker
+      tags: [docker]
+    - role: vpn
+      tags: [vpn]

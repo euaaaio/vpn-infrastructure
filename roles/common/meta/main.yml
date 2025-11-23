@@ -1,0 +1,12 @@
+---
+dependencies:
+  - role: geerlingguy.security
+    vars:
+      security_ssh_permit_root_login: "yes"
+      security_ssh_password_authentication: "no"
+      security_autoupdate_enabled: false
+
+  - role: geerlingguy.swap
+    vars:
+      swap_file_size_mb: 2048
+      swap_swappiness: 10

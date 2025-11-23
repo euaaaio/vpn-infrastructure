@@ -1,0 +1,15 @@
+---
+# Ports
+https_port: 8443
+vless_port: 26670
+
+# Base path for all VPN configs
+vpn_path: /srv/vpn
+
+# SSL certificate
+ssl_cert_path: "{{ vpn_path }}/ssl/vpn.crt"
+ssl_key_path: "{{ vpn_path }}/ssl/vpn.key"
+
+# 3x-ui configuration
+xui_port: 2053
+xui_db_path: "{{ vpn_path }}/x-ui"

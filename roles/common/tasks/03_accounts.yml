@@ -1,0 +1,41 @@
+---
+- name: Add basic groups
+  ansible.builtin.group:
+    name: "{{ item }}"
+  loop:
+    - ssh
+
+- name: Add root to ssh group
+  ansible.builtin.user:
+    name: root
+    groups: ssh
+    append: true
+
+- name: Add accounts
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups:
+      - root
+      - sudo
+      - ssh
+      - docker
+    shell: /bin/bash
+  loop:
+    - euaaaio
+
+- name: Add ssh keys
+  ansible.posix.authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ item.key }}"
+  loop:
+    - username: euaaaio
+      key: https://github.com/euaaaio.keys
+  loop_control:
+    label: "{{ item.username }}"
+
+- name: Limit SSH access to ssh group only
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    search_string: AllowGroups
+    line: AllowGroups ssh
+  notify: Reload sshd

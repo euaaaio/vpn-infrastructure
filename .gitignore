@@ -1,0 +1,6 @@
+venv/
+backup/
+.ansible/
+
+.vault-key
+hosts

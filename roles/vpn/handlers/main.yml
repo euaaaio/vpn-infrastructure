@@ -1,0 +1,14 @@
+---
+- name: Restart containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ vpn_path }}"
+    state: present
+    recreate: always
+
+- name: Restart nginx
+  community.docker.docker_compose_v2:
+    project_src: "{{ vpn_path }}"
+    services:
+      - nginx
+    state: present
+    recreate: always

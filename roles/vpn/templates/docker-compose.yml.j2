@@ -1,0 +1,22 @@
+services:
+  xui:
+    image: ghcr.io/mhsanaei/3x-ui:latest
+    container_name: xui
+    volumes:
+      - {{ xui_db_path }}:/etc/x-ui/
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+    tty: true
+    network_mode: host
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - {{ vpn_path }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - {{ vpn_path }}/nginx/htpasswd:/etc/nginx/htpasswd:ro
+      - {{ ssl_cert_path }}:{{ ssl_cert_path }}:ro
+      - {{ ssl_key_path }}:{{ ssl_key_path }}:ro
+    network_mode: host
+    restart: unless-stopped
