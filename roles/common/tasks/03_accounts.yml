@@ -4,6 +4,7 @@
     name: "{{ item }}"
   loop:
     - ssh
+    - docker
 
 - name: Add root to ssh group
   ansible.builtin.user:
