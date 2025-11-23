@@ -16,7 +16,7 @@
           - '--rsync-path="sudo rsync"'
       delegate_to: localhost
       become: false
-      ignore_errors: true
+      failed_when: false
       tags: [backup]
 
   roles:
