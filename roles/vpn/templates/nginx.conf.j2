@@ -48,7 +48,7 @@ http {
             proxy_set_header Connection "upgrade";
         }
 
-        location /api/v2/sub/plain {
+        location /c/j {
             auth_basic off;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto https;
@@ -62,7 +62,7 @@ http {
             proxy_pass http://xui_backend_sub;
         }
 
-        location /api/v2/sub/json {
+        location /c/p {
             auth_basic off;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto https;
