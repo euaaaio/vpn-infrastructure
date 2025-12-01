@@ -24,11 +24,12 @@
     port: "{{ https_port }}"
     proto: tcp
 
-- name: Allow VLESS Reality
+- name: Allow VLESS Reality ports
   community.general.ufw:
     rule: allow
-    port: "{{ vless_port }}"
+    port: "{{ item }}"
     proto: tcp
+  loop: "{{ vless_ports }}"
 
 - name: Enable UFW and deny all other incoming
   community.general.ufw:

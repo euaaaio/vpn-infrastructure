@@ -1,7 +1,9 @@
 ---
 # Ports
 https_port: 8443
-vless_port: 26670
+vless_ports:
+  - 26670
+  - 443
 
 # Base path for all VPN configs
 vpn_path: /srv/vpn
