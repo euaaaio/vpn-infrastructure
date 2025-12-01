@@ -1,21 +1,52 @@
 ---
-- name: Ensure SSL directory exists
+- name: Install certbot
+  ansible.builtin.apt:
+    name: certbot
+    state: present
+    update_cache: yes
+
+- name: Ensure letsencrypt directory exists
   ansible.builtin.file:
-    path: "{{ vpn_path }}/ssl"
+    path: "{{ letsencrypt_path }}"
     state: directory
     mode: "0755"
 
-- name: Generate self-signed SSL certificate
-  ansible.builtin.command: >
-    openssl req -x509 -nodes -days 3650
-    -newkey rsa:2048
-    -keyout {{ ssl_key_path }}
-    -out {{ ssl_cert_path }}
-    -subj "/CN={{ domain }}"
-  args:
-    creates: "{{ ssl_cert_path }}"
+- name: Check if certificate already exists
+  ansible.builtin.stat:
+    path: "{{ ssl_cert_path }}"
+  register: cert_exists
 
-- name: Set SSL key permissions
-  ansible.builtin.file:
-    path: "{{ ssl_key_path }}"
-    mode: "0600"
+- name: Obtain Let's Encrypt certificate
+  when: not cert_exists.stat.exists
+  block:
+    - name: Stop nginx container for certificate generation
+      community.docker.docker_container:
+        name: nginx
+        state: stopped
+      ignore_errors: true
+
+    - name: Request certificate from Let's Encrypt
+      ansible.builtin.command: >
+        certbot certonly --standalone
+        --non-interactive
+        --agree-tos
+        --email {{ acme_email }}
+        -d {{ domain }}
+        --preferred-challenges http
+        --config-dir {{ letsencrypt_path }}
+        --work-dir {{ letsencrypt_path }}/work
+        --logs-dir {{ letsencrypt_path }}/logs
+
+    - name: Start nginx container
+      community.docker.docker_container:
+        name: nginx
+        state: started
+      ignore_errors: true
+
+- name: Setup certificate auto-renewal
+  ansible.builtin.cron:
+    name: "Renew Let's Encrypt certificates"
+    minute: "0"
+    hour: "3"
+    job: "certbot renew --config-dir {{ letsencrypt_path }} --work-dir {{ letsencrypt_path }}/work --logs-dir {{ letsencrypt_path }}/logs --quiet --deploy-hook 'docker restart nginx' >> {{ letsencrypt_path }}/logs/renew.log 2>&1"
+    user: root

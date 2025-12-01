@@ -16,7 +16,6 @@ services:
     volumes:
       - {{ vpn_path }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - {{ vpn_path }}/nginx/htpasswd:/etc/nginx/htpasswd:ro
-      - {{ ssl_cert_path }}:{{ ssl_cert_path }}:ro
-      - {{ ssl_key_path }}:{{ ssl_key_path }}:ro
+      - {{ letsencrypt_path }}:{{ letsencrypt_path }}:ro
     network_mode: host
     restart: unless-stopped

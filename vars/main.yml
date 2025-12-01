@@ -9,8 +9,9 @@ vless_ports:
 vpn_path: /srv/vpn
 
 # SSL certificate
-ssl_cert_path: "{{ vpn_path }}/ssl/vpn.crt"
-ssl_key_path: "{{ vpn_path }}/ssl/vpn.key"
+letsencrypt_path: "{{ vpn_path }}/letsencrypt"
+ssl_cert_path: "{{ letsencrypt_path }}/live/{{ domain }}/fullchain.pem"
+ssl_key_path: "{{ letsencrypt_path }}/live/{{ domain }}/privkey.pem"
 
 # 3x-ui configuration
 xui_port: 2053
