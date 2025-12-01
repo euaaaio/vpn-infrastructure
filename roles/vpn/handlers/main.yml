@@ -12,3 +12,9 @@
       - nginx
     state: present
     recreate: always
+
+- name: Restart xui
+  community.docker.docker_container:
+    name: xui
+    state: started
+    restart: true
