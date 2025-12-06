@@ -1,0 +1,17 @@
+---
+services:
+  remnanode:
+    container_name: remnanode
+    hostname: remnanode
+    image: remnawave/node:latest
+    network_mode: host
+    restart: always
+    environment:
+      - NODE_PORT={{ remnanode_port }}
+      - SECRET_KEY={{ remnanode_secret_key }}
+    volumes:
+      - caddy-ssl-data:/var/lib/remnawave/configs/xray/ssl:ro
+
+volumes:
+  caddy-ssl-data:
+    external: true

@@ -10,6 +10,3 @@
 
 - name: Configure firewall
   ansible.builtin.include_tasks: 04_firewall.yml
-
-- name: Install DigitalOcean Metrics Agent
-  ansible.builtin.include_tasks: 05_do_agent.yml

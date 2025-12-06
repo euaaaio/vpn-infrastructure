@@ -1,0 +1,63 @@
+---
+- name: Create Remnawave directory structure
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - "{{ remnawave_path }}"
+    - "{{ remnawave_data_path }}"
+
+- name: Ensure Docker network exists
+  community.docker.docker_network:
+    name: "{{ docker_caddy_network }}"
+    state: present
+
+- name: Download official docker-compose-prod.yml from Remnawave repository
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/remnawave/backend/refs/heads/main/docker-compose-prod.yml
+    dest: "{{ remnawave_path }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+    force: true
+
+- name: Create docker-compose.override.yml for network configuration
+  ansible.builtin.template:
+    src: docker-compose.override.yml.j2
+    dest: "{{ remnawave_path }}/docker-compose.override.yml"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Generate .env file from Vault secrets
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ remnawave_path }}/.env"
+    mode: '0600'
+    owner: root
+    group: root
+  no_log: true  # Don't show secrets in logs!
+
+- name: Start Remnawave services
+  community.docker.docker_compose_v2:
+    project_src: "{{ remnawave_path }}"
+    state: present
+    remove_orphans: true
+  register: compose_result
+
+- name: Wait for panel to be healthy
+  ansible.builtin.wait_for:
+    port: "{{ remnawave_panel_port }}"
+    timeout: 120
+
+- name: Get initial admin URL from logs
+  ansible.builtin.shell:
+    cmd: set -o pipefail && docker logs remnawave 2>&1 | grep -i "secret" | tail -1
+  args:
+    executable: /bin/bash
+  register: admin_url
+  changed_when: false
+  failed_when: false

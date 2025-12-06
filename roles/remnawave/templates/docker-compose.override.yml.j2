@@ -1,0 +1,13 @@
+services:
+  remnawave:
+    volumes:
+      - caddy-ssl-data:/var/lib/remnawave/configs/xray/ssl:ro
+
+volumes:
+  caddy-ssl-data:
+    external: true
+
+networks:
+  remnawave-network:
+    name: {{ docker_caddy_network }}
+    external: true

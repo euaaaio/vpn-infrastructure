@@ -1,0 +1,36 @@
+---
+- name: Create subscription page directory
+  ansible.builtin.file:
+    path: "{{ subscription_path }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Generate subscription page docker-compose.yml
+  ansible.builtin.template:
+    src: subscription-compose.yml.j2
+    dest: "{{ subscription_path }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Generate subscription page .env
+  ansible.builtin.template:
+    src: subscription.env.j2
+    dest: "{{ subscription_path }}/.env"
+    mode: '0600'
+    owner: root
+    group: root
+
+- name: Start subscription page
+  community.docker.docker_compose_v2:
+    project_src: "{{ subscription_path }}"
+    state: present
+    remove_orphans: true
+  register: subscription_compose
+
+- name: Wait for subscription page to be ready
+  ansible.builtin.wait_for:
+    port: "{{ subscription_port }}"
+    timeout: 60

@@ -1,0 +1,38 @@
+services:
+  remnawave-caddy:
+    image: remnawave/caddy-with-auth:latest
+    container_name: remnawave-caddy
+    hostname: remnawave-caddy
+    restart: always
+    environment:
+      - AUTH_TOKEN_LIFETIME={{ caddy_auth_token_lifetime }}
+      - REMNAWAVE_PANEL_DOMAIN={{ domain }}
+      - REMNAWAVE_CUSTOM_LOGIN_ROUTE={{ caddy_custom_login_route }}
+      - AUTHP_ADMIN_USER={{ caddy_admin_user }}
+      - AUTHP_ADMIN_EMAIL={{ caddy_admin_email }}
+      - AUTHP_ADMIN_SECRET={{ caddy_admin_secret }}
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+      - "0.0.0.0:443:443/udp"  # HTTP/3
+    networks:
+      - {{ docker_caddy_network }}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-ssl-data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+volumes:
+  caddy-ssl-data:
+    driver: local
+    name: caddy-ssl-data
+
+networks:
+  {{ docker_caddy_network }}:
+    name: {{ docker_caddy_network }}
+    external: true
+

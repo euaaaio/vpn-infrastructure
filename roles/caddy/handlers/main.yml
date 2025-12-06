@@ -1,0 +1,12 @@
+---
+- name: Restart caddy
+  community.docker.docker_compose_v2:
+    project_src: "{{ caddy_path }}"
+    state: restarted
+  listen: "restart caddy"
+
+- name: Reload caddy config
+  ansible.builtin.command:
+    cmd: docker exec remnawave-caddy caddy reload --config /etc/caddy/Caddyfile
+  listen: "reload caddy"
+  changed_when: true

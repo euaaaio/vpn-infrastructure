@@ -1,4 +1,4 @@
-.PHONY: install vault-create vault-decrypt deploy backup lint lint-yml
+.PHONY: install vault-create vault-decrypt deploy deploy-node backup lint lint-yml
 
 install:
 	python3 -m venv venv
@@ -14,10 +14,13 @@ vault-decrypt:
 	ansible-vault decrypt vars/secrets.yml
 
 deploy:
-	ansible-playbook site.yml -u root
+	ansible-playbook panel.yml -u root
+
+deploy-node:
+	ansible-playbook node.yml -u root
 
 backup:
-	ansible-playbook site.yml -u root --tags backup
+	ansible-playbook panel.yml -u root --tags backup
 
 lint-yml:
 	@yamllint --strict . && echo "Yaml linting ok"

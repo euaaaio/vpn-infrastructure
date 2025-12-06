@@ -14,23 +14,22 @@
 
 - name: Add accounts
   ansible.builtin.user:
-    name: "{{ item }}"
+    name: "{{ item.username }}"
     groups:
       - root
       - sudo
       - ssh
       - docker
     shell: /bin/bash
-  loop:
-    - euaaaio
+  loop: "{{ admin_users | default([]) }}"
+  loop_control:
+    label: "{{ item.username }}"
 
 - name: Add ssh keys
   ansible.posix.authorized_key:
     user: "{{ item.username }}"
-    key: "{{ item.key }}"
-  loop:
-    - username: euaaaio
-      key: https://github.com/euaaaio.keys
+    key: "https://github.com/{{ item.github }}.keys"
+  loop: "{{ admin_users | default([]) }}"
   loop_control:
     label: "{{ item.username }}"
 
