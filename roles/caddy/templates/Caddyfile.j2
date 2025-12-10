@@ -1,0 +1,80 @@
+{
+    order authenticate before respond
+    order authorize before respond
+
+    security {
+        local identity store localdb {
+            realm local
+            path /data/.local/caddy/users.json
+        }
+
+        authentication portal remnawaveportal {
+            crypto default token lifetime {{ caddy_auth_token_lifetime }}
+            enable identity store localdb
+            cookie domain {{ domain }}
+            ui {
+                links {
+                    "Remnawave" "/dashboard/home" icon "las la-tachometer-alt"
+                    "My Identity" "/{{ caddy_custom_login_route }}/whoami" icon "las la-user"
+                    "API Keys" "/{{ caddy_custom_login_route }}/settings/apikeys" icon "las la-key"
+                    "MFA" "/{{ caddy_custom_login_route }}/settings/mfa" icon "lab la-keycdn"
+                }
+            }
+            transform user {
+                match origin local
+                require mfa
+                action add role authp/admin
+            }
+        }
+
+        authorization policy panelpolicy {
+            set auth url /restricted
+            allow roles authp/admin
+            with api key auth portal remnawaveportal realm local
+            acl rule {
+                comment "Accept"
+                match role authp/admin
+                allow stop log info
+            }
+            acl rule {
+                comment "Deny"
+                match any
+                deny log warn
+            }
+        }
+    }
+}
+
+https://{{ domain }} {
+    @login_path {
+        path /{{ caddy_custom_login_route }} /{{ caddy_custom_login_route }}/ /{{ caddy_custom_login_route }}/auth
+    }
+
+    route @login_path {
+        rewrite * /auth
+        request_header +X-Forwarded-Prefix /{{ caddy_custom_login_route }}
+        authenticate with remnawaveportal
+    }
+
+    handle_path /restricted* {
+      abort
+    }
+
+    route /api/* {
+      authorize with panelpolicy
+      reverse_proxy http://remnawave:3000
+    }
+
+    route /{$REMNAWAVE_CUSTOM_LOGIN_ROUTE}* {
+      authenticate with remnawaveportal
+    }
+
+    route /* {
+      authorize with panelpolicy
+      reverse_proxy http://remnawave:3000
+    }
+}
+
+https://{{ subscription_domain }} {
+  reverse_proxy http://remnawave-subscription-page:{{ subscription_port }}
+}

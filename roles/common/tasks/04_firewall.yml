@@ -6,30 +6,12 @@
     line: 'IPV6=yes'
   notify: Reload ufw
 
-- name: Allow SSH
-  community.general.ufw:
-    rule: allow
-    port: 22
-    proto: tcp
-
-- name: Allow HTTP (for redirects)
-  community.general.ufw:
-    rule: allow
-    port: 80
-    proto: tcp
-
-- name: Allow HTTPS (panel)
-  community.general.ufw:
-    rule: allow
-    port: "{{ https_port }}"
-    proto: tcp
-
-- name: Allow VLESS Reality ports
+- name: Allow ports
   community.general.ufw:
     rule: allow
     port: "{{ item }}"
-    proto: tcp
-  loop: "{{ vless_ports }}"
+    proto: any
+  loop: "{{ exposed_ports }}"
 
 - name: Enable UFW and deny all other incoming
   community.general.ufw:

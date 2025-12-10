@@ -1,0 +1,54 @@
+---
+- name: Deploy Remnawave Panel
+  hosts: panel
+  become: true
+  vars_files:
+    - vars/main.yml
+    - vars/secrets.yml
+  vars:
+    exposed_ports: "{{ panel_exposed_ports }}"
+
+  pre_tasks:
+    - name: Check if Remnawave data exists
+      ansible.builtin.stat:
+        path: "{{ remnawave_path }}"
+      register: remnawave_dir
+
+    - name: Backup Remnawave data before deploy
+      when: remnawave_dir.stat.exists
+      block:
+        - name: Backup Remnawave data
+          ansible.posix.synchronize:
+            src: "{{ remnawave_path }}/"
+            dest: ./backup/remnawave/
+            mode: pull
+            rsync_opts:
+              - '--rsync-path="sudo rsync"'
+              - '--exclude=*.log'
+              - '--exclude=logs/'
+          delegate_to: localhost
+          become: false
+          failed_when: false
+          tags: [backup]
+
+  roles:
+    - role: common
+      tags: [common]
+
+    - role: docker
+      tags: [docker]
+
+    - role: caddy
+      tags: [caddy]
+
+    - role: remnawave
+      tags: [remnawave]
+
+  post_tasks:
+    - name: Display deployment summary
+      ansible.builtin.debug:
+        msg: |
+          Deployment Complete!
+          Panel Login: https://{{ domain }}/{{ caddy_custom_login_route }}
+          Auth Portal: https://{{ domain }}/{{ caddy_custom_login_route }}/auth
+          Subscription Page: https://{{ subscription_domain }}/<shortUuid>
