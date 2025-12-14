@@ -32,7 +32,7 @@
 - name: Start Caddy
   community.docker.docker_compose_v2:
     project_src: "{{ caddy_path }}"
-    state: present
+    state: restarted
     remove_orphans: true
   register: caddy_result
 
