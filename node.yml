@@ -14,9 +14,6 @@
     - role: common
       tags: [common]
 
-    - role: docker
-      tags: [docker]
-
     - role: remnanode
       tags: [remnanode]
 
