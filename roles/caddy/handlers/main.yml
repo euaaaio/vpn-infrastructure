@@ -1,0 +1,6 @@
+---
+- name: Reload caddy config
+  ansible.builtin.command:
+    cmd: docker exec remnawave-caddy caddy reload --config /etc/caddy/Caddyfile
+  listen: "reload caddy"
+  changed_when: true

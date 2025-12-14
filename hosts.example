@@ -1,2 +1,7 @@
-[vpn]
+[panel]
 127.0.0.1
+
+[nodes]
+127.0.0.1 node_subdomain=
+127.0.0.1 node_subdomain=
+

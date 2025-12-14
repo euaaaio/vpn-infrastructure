@@ -1,0 +1,12 @@
+---
+- name: Include Cloudflare DNS setup
+  ansible.builtin.include_tasks: 01_dns.yml
+  tags: [cloudflare]
+
+- name: Include Remnawave deployment
+  ansible.builtin.include_tasks: 02_deploy.yml
+  tags: [deploy, remnawave]
+
+- name: Include Subscription page deployment
+  ansible.builtin.include_tasks: 03_subscription.yml
+  tags: [deploy, subscription]

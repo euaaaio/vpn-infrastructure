@@ -1,0 +1,22 @@
+---
+- name: Configure Cloudflare DNS in systemd-resolved
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^#?DNS='
+    line: 'DNS=1.1.1.1 1.0.0.1 8.8.8.8'
+    state: present
+  register: dns_config
+
+- name: Configure fallback DNS in systemd-resolved
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^#?FallbackDNS='
+    line: 'FallbackDNS=8.8.4.4'
+    state: present
+  register: fallback_dns_config
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+  when: dns_config.changed or fallback_dns_config.changed

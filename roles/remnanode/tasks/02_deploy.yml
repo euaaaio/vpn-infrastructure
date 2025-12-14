@@ -1,0 +1,28 @@
+---
+- name: Create Remnanode directory
+  ansible.builtin.file:
+    path: "{{ remnanode_path }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ remnanode_path }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Start Remnanode
+  community.docker.docker_compose_v2:
+    project_src: "{{ remnanode_path }}"
+    state: present
+    pull: always
+    recreate: always
+  register: compose_result
+
+- name: Display node status
+  ansible.builtin.debug:
+    msg: "Remnanode started on port {{ remnanode_port }} at {{ node_subdomain }}.{{ cloudflare_zone }}"

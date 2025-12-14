@@ -1,0 +1,8 @@
+---
+- name: Include DNS setup
+  ansible.builtin.include_tasks: 01_dns.yml
+  tags: [dns]
+
+- name: Include Remnanode deployment
+  ansible.builtin.include_tasks: 02_deploy.yml
+  tags: [deploy, remnanode]

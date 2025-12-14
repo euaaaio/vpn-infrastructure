@@ -1,0 +1,44 @@
+---
+- name: Create Caddy directory
+  ansible.builtin.file:
+    path: "{{ caddy_path }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Deploy Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: "{{ caddy_path }}/Caddyfile"
+    mode: '0644'
+    owner: root
+    group: root
+  notify: reload caddy
+
+- name: Deploy Caddy docker-compose
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ caddy_path }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Ensure Docker network exists
+  community.docker.docker_network:
+    name: "{{ docker_caddy_network }}"
+    state: present
+
+- name: Start Caddy
+  community.docker.docker_compose_v2:
+    project_src: "{{ caddy_path }}"
+    state: restarted
+    remove_orphans: true
+  register: caddy_result
+
+- name: Wait for Caddy to be ready
+  ansible.builtin.wait_for:
+    port: 443
+    host: "0.0.0.0"
+    delay: 5
+    timeout: 60

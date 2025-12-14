@@ -17,7 +17,8 @@ rules:
     forbid-explicit-octal: true # yamllint defaults to false
 
 ignore:
+  - .git/
+  - .ansible/
   - venv/
   - backup/
-  - .git/
-  - secrets.yml
+  - vars/secrets.yml
