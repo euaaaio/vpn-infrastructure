@@ -54,13 +54,7 @@
         "dns": ["1.1.1.1", "1.0.0.1", "8.8.8.8"]
       }
     mode: '0644'
-  register: docker_daemon_config
-
-- name: Restart Docker if config changed
-  ansible.builtin.service:
-    name: docker
-    state: restarted
-  when: docker_daemon_config.changed
+  notify: Restart docker
 
 - name: Ensure Docker is running
   ansible.builtin.service:
