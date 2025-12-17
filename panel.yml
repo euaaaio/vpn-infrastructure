@@ -8,29 +8,6 @@
   vars:
     exposed_ports: "{{ panel_exposed_ports }}"
 
-  pre_tasks:
-    - name: Check if Remnawave data exists
-      ansible.builtin.stat:
-        path: "{{ remnawave_path }}"
-      register: remnawave_dir
-
-    - name: Backup Remnawave data before deploy
-      when: remnawave_dir.stat.exists
-      block:
-        - name: Backup Remnawave data
-          ansible.posix.synchronize:
-            src: "{{ remnawave_path }}/"
-            dest: ./backup/remnawave/
-            mode: pull
-            rsync_opts:
-              - '--rsync-path="sudo rsync"'
-              - '--exclude=*.log'
-              - '--exclude=logs/'
-          delegate_to: localhost
-          become: false
-          failed_when: false
-          tags: [backup]
-
   roles:
     - role: common
       tags: [common]
