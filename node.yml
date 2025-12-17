@@ -1,18 +1,32 @@
 ---
-- name: Deploy Remnawave Node
-  hosts: nodes
+- name: Deploy Entry Nodes
+  hosts: entry_nodes
   become: true
   vars_files:
     - vars/main.yml
     - vars/secrets.yml
   vars:
-    exposed_ports: "{{ node_exposed_ports }}"
+    exposed_ports: "{{ entry_node_exposed_ports }}"
 
   roles:
-    - role: apt_update
-
     - role: common
       tags: [common]
 
-    - role: remnanode
-      tags: [remnanode]
+    - role: entry_node
+      tags: [entry_node, xhttp]
+
+- name: Deploy Exit Nodes
+  hosts: exit_nodes
+  become: true
+  vars_files:
+    - vars/main.yml
+    - vars/secrets.yml
+  vars:
+    exposed_ports: "{{ exit_node_exposed_ports }}"
+
+  roles:
+    - role: common
+      tags: [common]
+
+    - role: exit_node
+      tags: [exit_node]

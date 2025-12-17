@@ -1,7 +1,10 @@
 ---
-# Paths
+# Paths - Panel
 remnawave_path: /opt/remnawave
 remnawave_data_path: "{{ remnawave_path }}/data"
 subscription_path: "{{ remnawave_path }}/subscription"
 caddy_path: /opt/caddy
-remnanode_path: /opt/remnanode
+
+# Paths - Nodes
+entry_node_path: /opt/entry-node
+exit_node_path: /opt/exit-node

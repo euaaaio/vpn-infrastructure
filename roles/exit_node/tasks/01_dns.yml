@@ -1,0 +1,15 @@
+---
+- name: Create Cloudflare DNS record for exit node
+  community.general.cloudflare_dns:
+    zone: "{{ cloudflare_zone }}"
+    record: "{{ node_subdomain }}"
+    type: A
+    value: "{{ ansible_host | default(inventory_hostname) }}"
+    proxied: false
+    api_token: "{{ cloudflare_api_token }}"
+    state: present
+  become: false
+
+- name: Display DNS configuration
+  ansible.builtin.debug:
+    msg: "Exit node DNS record configured: {{ node_subdomain }}.{{ cloudflare_zone }} -> {{ ansible_host | default(inventory_hostname) }}"

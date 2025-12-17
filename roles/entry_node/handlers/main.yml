@@ -1,0 +1,6 @@
+---
+- name: Restart entry-node
+  community.docker.docker_compose_v2:
+    project_src: "{{ entry_node_path }}"
+    state: present
+    recreate: always
