@@ -1,0 +1,10 @@
+---
+- name: Include DNS setup for XHTTP
+  ansible.builtin.include_tasks: 01_dns.yml
+  tags: [dns]
+  when: xhttp_subdomain is defined
+
+- name: Include Caddy Node deployment
+  ansible.builtin.include_tasks: 02_deploy.yml
+  tags: [deploy, caddy_node]
+  when: xhttp_subdomain is defined

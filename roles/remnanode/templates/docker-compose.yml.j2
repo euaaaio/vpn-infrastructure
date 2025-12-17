@@ -13,3 +13,7 @@ services:
     environment:
       - NODE_PORT={{ remnanode_port }}
       - SECRET_KEY={{ remnanode_secret_key }}
+{% if xhttp_subdomain is defined %}
+    volumes:
+      - {{ caddy_node_path }}/data:/var/lib/remnawave/configs/xray/ssl:ro
+{% endif %}

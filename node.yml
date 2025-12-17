@@ -14,5 +14,9 @@
     - role: common
       tags: [common]
 
+    - role: caddy_node
+      tags: [caddy_node, xhttp]
+      when: xhttp_subdomain is defined
+
     - role: remnanode
       tags: [remnanode]
