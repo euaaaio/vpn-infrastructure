@@ -13,3 +13,6 @@
 
 - name: Configure firewall
   ansible.builtin.include_tasks: 04_firewall.yml
+
+- name: Configure network tuning
+  ansible.builtin.include_tasks: 06_sysctl.yml
