@@ -11,5 +11,11 @@
 - name: Configure DNS
   ansible.builtin.include_tasks: 05_dns.yml
 
+- name: Configure sysctl network tuning
+  ansible.builtin.include_tasks: 06_sysctl.yml
+
 - name: Configure firewall
   ansible.builtin.include_tasks: 04_firewall.yml
+
+- name: Disable IPv6
+  ansible.builtin.include_tasks: 07_disable_ipv6.yml

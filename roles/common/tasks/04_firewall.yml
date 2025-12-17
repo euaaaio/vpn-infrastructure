@@ -13,6 +13,20 @@
     proto: any
   loop: "{{ exposed_ports }}"
 
+# Allow traffic from exit nodes before INVALID drop rule
+# This is critical for VPN stability - without it, return packets get dropped as INVALID
+- name: Allow traffic from exit nodes in UFW before.rules
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/before.rules
+    insertafter: "# quickly process packets for which we already have a connection"
+    block: |
+      # Allow all traffic from exit node (before INVALID drop)
+      -A ufw-before-input -s {{ hostvars[item]['ansible_host'] | default(item) }} -j ACCEPT
+    marker: "# {mark} ANSIBLE MANAGED - EXIT NODE {{ item }}"
+  loop: "{{ groups['exit_nodes'] | default([]) }}"
+  when: "'entry_nodes' in group_names"
+  notify: Reload ufw
+
 - name: Enable UFW and deny all other incoming
   community.general.ufw:
     state: enabled

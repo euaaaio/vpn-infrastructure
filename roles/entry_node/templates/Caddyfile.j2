@@ -1,17 +1,31 @@
-# Caddy configuration for XHTTP TLS Self-Steal
+# Caddy configuration for XHTTP reverse proxy
 # Domain: {{ node_subdomain }}.{{ cloudflare_zone }}
+# Caddy terminates TLS and forwards to Xray via h2c (HTTP/2 cleartext)
 
 {
     # Disable automatic HTTPS redirects
     auto_https disable_redirects
+    # HTTP port for ACME challenges
+    http_port 80
+    # HTTPS port for XHTTP traffic
+    https_port 8443
 }
 
-# HTTP endpoint for ACME challenge (obtains Let's Encrypt certificate via HTTP-01)
-http://{{ node_subdomain }}.{{ cloudflare_zone }}:80 {
-    respond "Site under construction" 200
+# XHTTP reverse proxy - Caddy terminates TLS, forwards to Xray via h2c
+{{ node_subdomain }}.{{ cloudflare_zone }}:8443 {
+    # Forward /x* requests to Xray XHTTP inbound via HTTP/2 cleartext
+    @xhttp path /x*
+    handle @xhttp {
+        reverse_proxy h2c://127.0.0.1:{{ entry_node_xhttp_internal_port }}
+    }
+
+    # Fallback for non-XHTTP requests (camouflage)
+    handle {
+        respond "Site under construction" 200
+    }
 }
 
-# Fallback endpoint (Xray will proxy here for non-XHTTP traffic)
+# Fallback endpoint for Xray REALITY
 :{{ entry_node_xhttp_fallback_port }} {
     respond "Site under construction" 200
 }
