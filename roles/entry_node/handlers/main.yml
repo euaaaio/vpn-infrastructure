@@ -1,6 +1,6 @@
 ---
-- name: Restart caddy-node
+- name: Restart entry-node
   community.docker.docker_compose_v2:
-    project_src: "{{ caddy_node_path }}"
+    project_src: "{{ entry_node_path }}"
     state: present
     recreate: always

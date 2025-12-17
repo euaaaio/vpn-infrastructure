@@ -3,6 +3,6 @@
   ansible.builtin.include_tasks: 01_dns.yml
   tags: [dns]
 
-- name: Include Remnanode deployment
+- name: Include Entry Node deployment
   ansible.builtin.include_tasks: 02_deploy.yml
-  tags: [deploy, remnanode]
+  tags: [deploy, entry_node]

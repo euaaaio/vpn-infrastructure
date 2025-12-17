@@ -1,0 +1,54 @@
+---
+- name: Create Entry Node directory
+  ansible.builtin.file:
+    path: "{{ entry_node_path }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create Caddy data directory
+  ansible.builtin.file:
+    path: "{{ entry_node_path }}/data"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Deploy Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: "{{ entry_node_path }}/Caddyfile"
+    mode: '0644'
+    owner: root
+    group: root
+  notify: Restart entry-node
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ entry_node_path }}/docker-compose.yml"
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Start Entry Node
+  community.docker.docker_compose_v2:
+    project_src: "{{ entry_node_path }}"
+    state: present
+    pull: always
+  register: entry_compose_result
+
+- name: Wait for Caddy to obtain certificates
+  ansible.builtin.pause:
+    seconds: 10
+  when: entry_compose_result.changed
+
+- name: Display Entry Node status
+  ansible.builtin.debug:
+    msg: |
+      Entry Node started!
+      Domain: {{ node_subdomain }}.{{ cloudflare_zone }}
+      Fallback port: {{ entry_node_xhttp_fallback_port }}
+      Remnanode port: {{ remnanode_port }}
+      Certificates: {{ entry_node_path }}/data/caddy/certificates/

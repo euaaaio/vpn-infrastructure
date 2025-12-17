@@ -1,7 +1,13 @@
 [panel]
 127.0.0.1
 
-[nodes]
+[entry_nodes]
 127.0.0.1 node_subdomain=
+
+[exit_nodes]
 127.0.0.1 node_subdomain=
+
+[nodes:children]
+entry_nodes
+exit_nodes
 

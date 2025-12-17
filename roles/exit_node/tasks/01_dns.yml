@@ -1,8 +1,8 @@
 ---
-- name: Create Cloudflare DNS record for XHTTP subdomain
+- name: Create Cloudflare DNS record for exit node
   community.general.cloudflare_dns:
     zone: "{{ cloudflare_zone }}"
-    record: "{{ xhttp_subdomain }}"
+    record: "{{ node_subdomain }}"
     type: A
     value: "{{ ansible_host | default(inventory_hostname) }}"
     proxied: false
@@ -10,6 +10,6 @@
     state: present
   become: false
 
-- name: Display XHTTP DNS configuration
+- name: Display DNS configuration
   ansible.builtin.debug:
-    msg: "XHTTP DNS record configured: {{ xhttp_subdomain }}.{{ cloudflare_zone }} -> {{ ansible_host | default(inventory_hostname) }}"
+    msg: "Exit node DNS record configured: {{ node_subdomain }}.{{ cloudflare_zone }} -> {{ ansible_host | default(inventory_hostname) }}"

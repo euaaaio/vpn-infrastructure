@@ -1,5 +1,5 @@
 ---
-- name: Create or update Cloudflare DNS records
+- name: Create Cloudflare DNS record for entry node
   community.general.cloudflare_dns:
     zone: "{{ cloudflare_zone }}"
     record: "{{ node_subdomain }}"
@@ -9,9 +9,7 @@
     api_token: "{{ cloudflare_api_token }}"
     state: present
   become: false
-  when: node_subdomain is defined
 
 - name: Display DNS configuration
   ansible.builtin.debug:
-    msg: "DNS record configured: {{ node_subdomain }}.{{ cloudflare_zone }} -> {{ ansible_host | default(inventory_hostname) }}"
-  when: node_subdomain is defined
+    msg: "Entry node DNS record configured: {{ node_subdomain }}.{{ cloudflare_zone }} -> {{ ansible_host | default(inventory_hostname) }}"

@@ -1,0 +1,17 @@
+# Caddy configuration for XHTTP TLS Self-Steal
+# Domain: {{ node_subdomain }}.{{ cloudflare_zone }}
+
+{
+    # Disable automatic HTTPS redirects
+    auto_https disable_redirects
+}
+
+# HTTP endpoint for ACME challenge (obtains Let's Encrypt certificate via HTTP-01)
+http://{{ node_subdomain }}.{{ cloudflare_zone }}:80 {
+    respond "Site under construction" 200
+}
+
+# Fallback endpoint (Xray will proxy here for non-XHTTP traffic)
+:{{ entry_node_xhttp_fallback_port }} {
+    respond "Site under construction" 200
+}

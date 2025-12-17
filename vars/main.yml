@@ -1,13 +1,10 @@
 ---
-# Paths
+# Paths - Panel
 remnawave_path: /opt/remnawave
 remnawave_data_path: "{{ remnawave_path }}/data"
 subscription_path: "{{ remnawave_path }}/subscription"
 caddy_path: /opt/caddy
-remnanode_path: /opt/remnanode
-caddy_node_path: /opt/caddy-node
 
-# XHTTP TLS (Self-Steal)
-xhttp_port: 8443
-xhttp_fallback_port: 8080
-xhttp_path: "/x/"
+# Paths - Nodes
+entry_node_path: /opt/entry-node
+exit_node_path: /opt/exit-node

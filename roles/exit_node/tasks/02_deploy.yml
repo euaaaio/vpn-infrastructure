@@ -1,7 +1,7 @@
 ---
-- name: Create Remnanode directory
+- name: Create Exit Node directory
   ansible.builtin.file:
-    path: "{{ remnanode_path }}"
+    path: "{{ exit_node_path }}"
     state: directory
     mode: '0755'
     owner: root
@@ -10,19 +10,19 @@
 - name: Deploy docker-compose.yml
   ansible.builtin.template:
     src: docker-compose.yml.j2
-    dest: "{{ remnanode_path }}/docker-compose.yml"
+    dest: "{{ exit_node_path }}/docker-compose.yml"
     mode: '0644'
     owner: root
     group: root
 
-- name: Start Remnanode
+- name: Start Exit Node
   community.docker.docker_compose_v2:
-    project_src: "{{ remnanode_path }}"
+    project_src: "{{ exit_node_path }}"
     state: present
     pull: always
     recreate: always
-  register: compose_result
+  register: exit_compose_result
 
-- name: Display node status
+- name: Display Exit Node status
   ansible.builtin.debug:
-    msg: "Remnanode started on port {{ remnanode_port }} at {{ node_subdomain }}.{{ cloudflare_zone }}"
+    msg: "Exit node started on port {{ remnanode_port }} at {{ node_subdomain }}.{{ cloudflare_zone }}"

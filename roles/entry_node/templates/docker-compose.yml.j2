@@ -1,0 +1,29 @@
+---
+services:
+  caddy:
+    container_name: entry-caddy
+    hostname: entry-caddy
+    image: caddy:2-alpine
+    restart: always
+    network_mode: host
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data:/data
+
+  remnanode:
+    container_name: entry-remnanode
+    hostname: entry-remnanode
+    image: remnawave/node:2.3.1
+    network_mode: host
+    restart: always
+    depends_on:
+      - caddy
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    environment:
+      - NODE_PORT={{ remnanode_port }}
+      - SECRET_KEY={{ remnanode_secret_key }}
+    volumes:
+      - ./data:/var/lib/remnawave/configs/xray/ssl:ro
