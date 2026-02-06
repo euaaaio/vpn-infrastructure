@@ -3,16 +3,14 @@
 # Caddy terminates TLS and forwards to Xray via h2c (HTTP/2 cleartext)
 
 {
-    # Disable automatic HTTPS redirects
-    auto_https disable_redirects
     # HTTP port for ACME challenges
     http_port 80
     # HTTPS port for XHTTP traffic
-    https_port 8443
+    https_port 443
 }
 
 # XHTTP reverse proxy - Caddy terminates TLS, forwards to Xray via h2c
-{{ node_subdomain }}.{{ cloudflare_zone }}:8443 {
+{{ node_subdomain }}.{{ cloudflare_zone }}:443 {
     # Forward /x* requests to Xray XHTTP inbound via HTTP/2 cleartext
     @xhttp path /x*
     handle @xhttp {
