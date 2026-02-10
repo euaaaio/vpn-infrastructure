@@ -4,6 +4,10 @@ services:
     container_name: remnawave-caddy
     hostname: remnawave-caddy
     restart: always
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
     environment:
       - AUTH_TOKEN_LIFETIME={{ caddy_auth_token_lifetime }}
       - REMNAWAVE_PANEL_DOMAIN={{ domain }}
