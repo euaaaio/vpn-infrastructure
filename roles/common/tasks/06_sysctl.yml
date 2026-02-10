@@ -73,12 +73,14 @@
     reload: true
     sysctl_file: /etc/sysctl.conf
   loop:
-    # Maximum backlog of pending connections (already optimal at 4096)
-    - { name: 'net.core.somaxconn', value: '4096' }
+    # Maximum backlog of pending connections
+    - { name: 'net.core.somaxconn', value: '8192' }
     # SYN backlog: queue size for half-open connections
     - { name: 'net.ipv4.tcp_max_syn_backlog', value: '8192' }
     # Network device backlog for incoming packets
     - { name: 'net.core.netdev_max_backlog', value: '16384' }
+    # Option memory per socket (ancillary data buffers)
+    - { name: 'net.core.optmem_max', value: '65536' }
 
 - name: Configure file descriptor limits
   ansible.posix.sysctl:
@@ -171,3 +173,21 @@
     - { name: 'net.ipv4.tcp_syncookies', value: '1' }
     # Local port range for outgoing connections
     - { name: 'net.ipv4.ip_local_port_range', value: '10000 65000' }
+
+- name: Optimize TCP behavior for persistent proxy connections
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.conf
+  loop:
+    # Don't reset congestion window after idle — critical for persistent
+    # VPN/proxy connections to avoid slow-start penalties on resume
+    - { name: 'net.ipv4.tcp_slow_start_after_idle', value: '0' }
+    # Don't cache TCP metrics from previous connections — each new
+    # connection starts fresh without inheriting slow-start thresholds
+    - { name: 'net.ipv4.tcp_no_metrics_save', value: '1' }
+    # Unsent data low-water threshold — helps HTTP/2 stream prioritization
+    # by allowing the kernel to schedule writes more efficiently
+    - { name: 'net.ipv4.tcp_notsent_lowat', value: '16384' }
