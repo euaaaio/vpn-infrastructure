@@ -7,6 +7,10 @@
     http_port 80
     # HTTPS port for XHTTP traffic
     https_port 443
+    # Disable HTTP/3 (QUIC) — often blocked in RU
+    servers {
+        protocols h1 h2
+    }
 }
 
 # XHTTP reverse proxy - Caddy terminates TLS, forwards to Xray via h2c
@@ -14,7 +18,10 @@
     # Forward /x* requests to Xray XHTTP inbound via HTTP/2 cleartext
     @xhttp path /x*
     handle @xhttp {
-        reverse_proxy h2c://127.0.0.1:{{ entry_node_xhttp_internal_port }}
+        reverse_proxy h2c://127.0.0.1:{{ entry_node_xhttp_internal_port }} {
+            # Low-latency: flush immediately, don't buffer (XHTTP is streaming)
+            flush_interval -1
+        }
     }
 
     # Fallback for non-XHTTP requests (camouflage)
